@@ -27,6 +27,14 @@ ${code}`;
 	  tokens[i] = "-";
 	break;
 
+	case "ASTERISK":
+	  tokens[i] = "*";
+	break;
+
+	case "SLASH":
+	  tokens[i] = "/";
+	break;
+
 	default:
 	  if (tokens[i].substr(0, 7) === "NUMBER_") {
             // decl arg is int ?
@@ -82,11 +90,13 @@ int main() {
       }
     } else if (parsed.mainFunction[i].type === "FUNCTION_CALL") {
       if (parsed.mainFunction[i].id === "out") { // internal function
-       res = res.replace("/* FUNCTIONS */", `/* FUNCTIONS */
+	if (!/void\ out/g.test(res)) {
+          res = res.replace("/* FUNCTIONS */", `/* FUNCTIONS */
 void out(auto ARGUMENT_1) {
   std::cout << ARGUMENT_1 << std::endl; 
 }
 `);
+	}
       }
 
      

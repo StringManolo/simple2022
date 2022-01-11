@@ -1,0 +1,30 @@
+addition {
+  $1 + $2
+}
+
+substraction {
+  $1 - $2
+}
+
+multiplication {
+  $1 * $2
+}
+
+division {
+  $1 / $2
+}
+
+num1 = 6
+num2 = 2
+
+res = addition num1 num2
+out res
+
+res = substraction num1 num2
+out res
+
+res = multiplication num1 num2
+out res
+
+res = division num1 num2
+out res
