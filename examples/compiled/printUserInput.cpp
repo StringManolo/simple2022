@@ -2,7 +2,7 @@
 
 /* FUNCTIONS */
 void out(auto ARGUMENT_1) {
-  std::cout << ARGUMENT_1 << std::endl; 
+  std::cout << ARGUMENT_1; 
 }
 
 auto in(auto ARGUMENT_1) {
@@ -14,8 +14,10 @@ auto in(auto ARGUMENT_1) {
 /* END FUNCTIONS */
 
 int main() {
-auto userInput = in ("Your name:");
+auto userInput = in ("Your name: ");
 out (userInput);
+auto userInput2 = in ("Your age: ");
+out (userInput2);
 
   return 0;
 }

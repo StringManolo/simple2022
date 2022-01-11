@@ -47,7 +47,12 @@ const parser = (tokens) => {
 	  numberOfArgs: numberOfArgs
 	});
       } else if (tokens[i + 1] === "ASSIGN") {                        // if next token is =
-        
+	let cast = false;
+        if (tokens[i + 2] === "CAST_NUMBER") {
+	  cast = "number";
+          //++i;
+	}
+
 	if (tokens[i + 2] === "STRING_START") {
           for (let k = i + 2; k < tokens.length; ++k) {
             let str = "";
@@ -70,10 +75,14 @@ const parser = (tokens) => {
 	  });
 
 	} else {
-          parsed.mainFunction.push({
+	  const aux = {
             type: "ASSIGNMENT",
 	    id: tokens[i].substring(3, tokens[i].length)
-	  })
+	  }
+          if (cast !== false) {
+            aux.cast = cast;
+	  }
+          parsed.mainFunction.push(aux);
 	}
       } else {                                                        // if next token is an argument (in a function call)
         const functionCall = {};
@@ -125,7 +134,9 @@ export default parser;
 /*
 const code = `
 
-name = "String Manolo "
+out "a"
+out "\\n"
+out "b"
 
 `;
 

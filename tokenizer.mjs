@@ -72,6 +72,9 @@ const tokenizer = code => {
               tokens.push(`STRING_CONTENT_${words[j]}`);
             }
             tokens.push("STRING_END");
+	  } else if (token.substring(0, 1) === "+" && /[a-zA-Z]/.test(token.substring(1, 2))) {
+            tokens.push("CAST_NUMBER");
+	    tokens.push("ID_" + token.substring(1, token.length));
 	  } else {
             tokens.push("UNKNOWN_" + token);
 	  } 

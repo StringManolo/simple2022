@@ -14,21 +14,24 @@ division {
   $1 / $2
 }
 
-num1 = in "Your first number"
-num2 = in "Your second number"
+num1 = +in "Your first number"
+num2 = +in "Your second number"
 
 res = addition num1 num2
 out num1
-out " +          "
+out " + "
 out num2
-out " =  "
+out " = "
 out res
 
+out "\n"
 res = substraction num1 num2
 out res
 
+out "\n"
 res = multiplication num1 num2
 out res
 
+out "\n"
 res = division num1 num2
 out res

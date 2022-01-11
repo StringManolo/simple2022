@@ -1,4 +1,6 @@
 import transpiler from "./transpiler.mjs";
+import tokenizer from "./tokenizer.mjs";
+import parser from "./parser.mjs";
 import fs from "fs";
 import * as exec from "child_process";
 
@@ -65,6 +67,21 @@ const createFileOverwrite = (filename, data) => {
 }
 
 
+const helpMessage = () => {
+  console.log(`usage: node compile.mjs -f examples/helloworld.imp -l c++
+
+-f, --file          The file holding the simple code
+-l, --language      The language the code is going to be compiled to
+
+-b, --build         Build the project (compile. needs output flag)
+-r, --run           Run the project (needs compile flag)
+-o, --output        Name of the file to output (if omited, output is shown in terminal)
+
+-t, --tokens        Print the tokenizer output instead
+-p, --parser        Print the parser output instead
+`);
+}
+
 const cli = {};
 for (let i = 0; i < process.argv.length; ++i) {
   switch(process.argv[i]) {
@@ -85,12 +102,7 @@ for (let i = 0; i < process.argv.length; ++i) {
 
     case "-h":
     case "--help":
-      console.log(`usage: node compile.mjs -f examples/helloworld.imp -l c++
-
--f, --file          The file holding the simple code
--l, --language      The language the code is going to be compiled to
-
-`);
+      helpMessage();
       process.exit(0);
     break;
 
@@ -99,6 +111,19 @@ for (let i = 0; i < process.argv.length; ++i) {
       cli.output = process.argv[+i+1];
     break;
 
+    case "-p":
+    case "--parser":
+      cli.parser = true;
+    break;
+
+    case "-t":
+    case "--token":
+    case "--tokens":
+    case "--tokenizer":
+      cli.tokens = true;
+    break;
+
+
     case "-r":
     case "--run":
       cli.run = true;
@@ -106,16 +131,24 @@ for (let i = 0; i < process.argv.length; ++i) {
   }
 }
 
+if (cli?.tokens) {
+  if (!cli?.code) {
+    cli.code = input();
+  }
+  console.log(JSON.stringify(tokenizer(cli.code), null, 2));
+  process.exit(0);
+}
+
+if (cli?.parser) {
+  if (!cli?.code) {
+    cli.code = input();
+  }
+  console.log(JSON.stringify(parser(tokenizer(cli.code)), null, 2));
+  process.exit(0);
+}
+
 if (!cli?.language) {
-  console.log(`usage: node compile.mjs -f examples/helloworld.imp -l c++
-
--f, --file          The file holding the simple code
--l, --language      The language the code is going to be compiled to
-
--b, --build         Build the project (compile. needs output flag)
--r, --run           Run the project (needs compile flag)
--o, --output        Name of the file to output (if omited, output is shown in terminal)
-`);
+  helpMessage();
   process.exit(0);
 }
 

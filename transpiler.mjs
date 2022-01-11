@@ -98,8 +98,22 @@ void out(auto ARGUMENT_1) {
 `);
 	}
       } else if (parsed.mainFunction[i].id === "in") { // internal function
-        if (!/auto\ in/g.test(res)) {
-          res = res.replace("/* FUNCTIONS */", `/* FUNCTIONS */
+	if (parsed.mainFunction[i-1]?.cast === "number") {
+	  parsed.mainFunction[i].id = "in_number";
+          if (!/auto\ in_number/g.test(res)) {
+            res = res.replace("/* FUNCTIONS */", `/* FUNCTIONS */
+auto in_number(auto ARGUMENT_1) {
+  std::cout << ARGUMENT_1;
+  std::string userInput;
+  getline(std::cin, userInput);
+  return std::stoi(userInput);
+}
+`);
+	  }
+	} else {
+
+          if (!/auto\ in/g.test(res)) {
+            res = res.replace("/* FUNCTIONS */", `/* FUNCTIONS */
 auto in(auto ARGUMENT_1) {
   std::cout << ARGUMENT_1;
   std::string userInput;
@@ -107,6 +121,7 @@ auto in(auto ARGUMENT_1) {
   return userInput;
 }
 `);
+	  }
 	}
       }
 

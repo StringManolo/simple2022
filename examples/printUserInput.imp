@@ -1,2 +1,5 @@
 userInput = in "Your name: "
 out userInput
+
+userInput2 = +in "Your age: "
+out userInput2
