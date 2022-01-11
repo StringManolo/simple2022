@@ -16,7 +16,7 @@ auto sub (auto ARGUMENT_1, auto ARGUMENT_2) {
 
 int main() {
 auto result = add (1, 2);
-sub (2, 1);
+ result = sub (2, 1);
 out (result);
 
   return 0;

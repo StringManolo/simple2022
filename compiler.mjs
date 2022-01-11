@@ -63,9 +63,19 @@ auto ${parsed.functions[i].id} ${args} {
 int main() {
 `;
 
+  let listOfVars = [];
+  let useAuto = true;
   for (let i in parsed.mainFunction) {
     if (parsed.mainFunction[i].type === "ASSIGNMENT") {
-      res += `auto ${parsed.mainFunction[i].id} = `;
+      for (let j in listOfVars) {
+        if (listOfVars[j] === parsed.mainFunction[i].id) {
+          useAuto = false;
+	}
+      }
+      listOfVars.push(parsed.mainFunction[i].id);
+      res += `${useAuto ? "auto" : ""} ${parsed.mainFunction[i].id} = `;
+
+      useAuto = true;
     } else if (parsed.mainFunction[i].type === "FUNCTION_CALL") {
       if (parsed.mainFunction[i].id === "out") { // internal function
        res = res.replace("/* FUNCTIONS */", `/* FUNCTIONS */
@@ -99,7 +109,7 @@ sub {
 }
 
 result = add 1 2
-sub 2 1
+result = sub 2 1
 
 out result
 `;
