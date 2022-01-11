@@ -1,132 +1,141 @@
-import tokenizer from "./tokenizer.mjs"
-import parser from "./parser.mjs"
+import transpiler from "./transpiler.mjs";
+import fs from "fs";
+import * as exec from "child_process";
 
-const compiler = {};
-compiler.cpp = (code) => {
-  const addLibraries = (code) => {
-    if (/void\ out/g.test(code)) {
-      code = `#include <iostream>
+const run = (args) => {
+  let res = exec.execSync(args).toString()
+  return res;
+};
 
-${code}`;
-    }
-    return code;
+const loadFile = (filename) => {
+  let retValue;
+  try {
+    retValue = fs.readFileSync(filename, { encoding: "utf-8" })
+  } catch(e) {
+    retValue = null;
   }
+  return retValue;
+};
 
-  const replaceTokens = (tokens) => {
-    for (let i in tokens) {
-      switch(tokens[i]) {
-        case "INTERNAL_RETURN":
-	  tokens[i] = "return";
-	break;
-
-	case "PLUS":
-	  tokens[i] = "+";
-	break;
-
-	case "MINUS":
-	  tokens[i] = "-";
-	break;
-
-	default:
-	  if (tokens[i].substr(0, 7) === "NUMBER_") {
-            // decl arg is int ?
-	    tokens[i] = tokens[i].substring(7, tokens[i].length);
-	  }
-      }
+const input = () => {
+  let rtnval = "";
+  let buffer = Buffer.alloc ? Buffer.alloc(1) : new Buffer(1);
+  for(;;) {
+    fs.readSync(0, buffer, 0, 1, null);
+    if(buffer[0] === 10) {
+      break;
+    } else if(buffer[0] !== 13) {
+      rtnval += new String(buffer);
     }
-    return tokens.join(" ");
   }
-
-  const tokens = tokenizer(code);
-  const parsed = parser(tokens);
-
-  let res = "/* FUNCTIONS */"
-  for (let i in parsed.functions) {
-    let args = "(";
-    for (let j = 0; j < parsed.functions[i].numberOfArgs; ++j) {
-      // track function calls to guess type
-      args += "auto ARGUMENT_" + (j + 1) + ", ";
-    }
-    args = args.substring(0, args.length - 2); // remove last comma
-    args += ")";
-
-
-    res += `
-auto ${parsed.functions[i].id} ${args} {
-  ${replaceTokens(parsed.functions[i].body)};
+  return rtnval;
 }
-`;
+
+const open = (filename, mode) => {
+  const fd = {};
+  try {
+    fd.internalFd = fs.openSync(filename, mode)
+    fd.read = (buffer, position, len) => fs.readSync(fd.internalFd, buffer, position, len, null);
+    fd.puts = (str) => fs.writeSync(fd.internalFd, str);
+    fd.close = () => fs.closeSync(fd.internalFd);
+    return fd;
+  } catch(err) {
+    console.log("open " + err);
+    return fd;
   }
-  res += "/* END FUNCTIONS */\n";
-
-  res += `
-int main() {
-`;
-
-  let listOfVars = [];
-  let useAuto = true;
-  for (let i in parsed.mainFunction) {
-    if (parsed.mainFunction[i].type === "ASSIGNMENT") {
-      for (let j in listOfVars) {
-        if (listOfVars[j] === parsed.mainFunction[i].id) {
-          useAuto = false;
-	}
-      }
-      listOfVars.push(parsed.mainFunction[i].id);
-      res += `${useAuto ? "auto" : ""} ${parsed.mainFunction[i].id} = `;
-
-      useAuto = true;
-    } else if (parsed.mainFunction[i].type === "FUNCTION_CALL") {
-      if (parsed.mainFunction[i].id === "out") { // internal function
-       res = res.replace("/* FUNCTIONS */", `/* FUNCTIONS */
-void out(auto ARGUMENT_1) {
-  std::cout << ARGUMENT_1 << std::endl; 
 }
+
+const createFile = (filename, data) => {
+  try {
+    if (!fs.existsSync(filename)) {
+      const fd = open(filename, "w");
+      fd.puts(data);
+      fd.close();
+    }
+  } catch(err) {
+    console.log("createFile " + err);
+  }
+}
+
+
+const createFileOverwrite = (filename, data) => {
+  const fd = open(filename, "w");
+  fd.puts(data);
+  fd.close();
+}
+
+
+const cli = {};
+for (let i = 0; i < process.argv.length; ++i) {
+  switch(process.argv[i]) {
+    case "-b":
+    case "--build":
+      cli.build = true; 
+    break;
+      
+    case "-f":
+    case "--file":
+      cli.code = loadFile(process.argv[+i+1]);
+    break;
+
+    case "-l":
+    case "--language":
+      cli.language = process.argv[+i+1];
+    break;
+
+    case "-h":
+    case "--help":
+      console.log(`usage: node compile.mjs -f examples/helloworld.imp -l c++
+
+-f, --file          The file holding the simple code
+-l, --language      The language the code is going to be compiled to
+
 `);
-      }
+      process.exit(0);
+    break;
 
-      res += `${parsed.mainFunction[i].id} (${replaceTokens(parsed.mainFunction[i].args).replace(/ /g, ", ")});\n`;
-    }
+    case "-o":
+    case "--output":
+      cli.output = process.argv[+i+1];
+    break;
+
+    case "-r":
+    case "--run":
+      cli.run = true;
+    break;
   }
-
-  res += "\n  return 0;\n}";
-
-
-  res = addLibraries(res);
-
-  // console.log(parsed);
-  console.log(res);
 }
 
-const code = `
+if (!cli?.language) {
+  console.log(`usage: node compile.mjs -f examples/helloworld.imp -l c++
 
-add {
-  $1 + $2
+-f, --file          The file holding the simple code
+-l, --language      The language the code is going to be compiled to
+
+-b, --build         Build the project (compile. needs output flag)
+-r, --run           Run the project (needs compile flag)
+-o, --output        Name of the file to output (if omited, output is shown in terminal)
+`);
+  process.exit(0);
 }
 
-sub {
-  $1 - $2
+if (!cli?.code) {
+  cli.code = input();
 }
 
-result = add 1 2
-result = sub 2 1
-
-out result
-`;
-
-compiler.cpp(code);
-
-/*
-
-{
-  functions: [
-    { id: 'add', body: [Array], numberOfArgs: 2 },
-    { id: 'sub', body: [Array], numberOfArgs: 2 }
-  ],
-
-  mainFunction: [
-    { type: 'FUNCTION_CALL', id: 'add', args: [Array] },
-    { type: 'FUNCTION_CALL', id: 'sub', args: [Array] }
-  ]
+if (cli?.language?.toLowerCase() === "cpp" || cli?.language?.toLowerCase() === "c++") {
+  const transpiled = transpiler.cpp(cli.code);
+  if (cli?.output) {
+    createFileOverwrite(cli.output, transpiled);
+    if (cli.build) {
+      run(`cp ${cli.output} ${cli.output}.internal.cpp && g++ -o ${cli.output} ${cli.output}.internal.cpp --std=c++20 && rm ${cli.output}.internal.cpp`);
+      if (cli.run) {
+        console.log(run(`chmod 0775 ${cli.output} && ./${cli.output}`));
+      }
+    }
+  } else {
+    console.log(transpiled);
+  }
 }
-*/
+
+

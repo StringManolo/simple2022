@@ -4,7 +4,8 @@ const tokenizer = code => {
   const lines = code.split("\n");
   for (let i in lines) {
     const words = lines[i].split(" ");
-    for (let j in words) {
+    for (let j = 0; j < words.length; ++j) {
+      // TODO: Parse commentaries (lines starting by # or multiline ? 
       switch(words[j].trim()) {
         case "{":
           tokens.push("LBRACE");
@@ -35,7 +36,7 @@ const tokenizer = code => {
 	break;
 
 	case "":
-          "pass";
+	  "pass";
 	break;
 
 	default: 
@@ -50,6 +51,27 @@ const tokenizer = code => {
             tokens.push("ID_" + token);
 	  } else if (/^[0-9]+$/.test(token)) {
             tokens.push("NUMBER_" + token);
+          } else if (token.substring(0, 1) === "\"") { // Parse " strings
+            tokens.push("STRING_START");
+	    tokens.push(`STRING_CONTENT_${token.substring(1, token.length)}`);
+	    while (j+1 !== words.length && words[j] !== "\\" && words[++j].trim() !== "\"") {
+	      if (words[j][words[j].length-1] === "\"") {
+                words[j] = words[j].substring(0, words[j].length - 1);
+	      }
+	      tokens.push(`STRING_CONTENT_${words[j]}`);
+	    }
+	    tokens.push("STRING_END");
+
+          } else if (token.substring(0, 1) === "'") { // Parse ' strings
+            tokens.push("STRING_START");
+            tokens.push(`STRING_CONTENT_${token.substring(1, token.length)}`);
+            while (j+1 !== words.length && words[j] !== "\\" && words[++j].trim() !== "'") {
+              if (words[j][words[j].length-1] === "'") {
+                words[j] = words[j].substring(0, words[j].length - 1);
+              }
+              tokens.push(`STRING_CONTENT_${words[j]}`);
+            }
+            tokens.push("STRING_END");
 	  } else {
             tokens.push("UNKNOWN_" + token);
 	  } 

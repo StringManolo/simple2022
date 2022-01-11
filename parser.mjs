@@ -4,6 +4,7 @@ const parser = (tokens) => {
   const parsed = {};                                                  // Object to save parsed data
   parsed.functions = [];                                              // The function definitions found in codei
   parsed.mainFunction = [];
+  parsed.strings = [];
   for (let i = 0; i < tokens.length; ++i) {                           // for each token found
     if (tokens[i].substring(0, 3) === "ID_") {                        // if token start by ID_
       if (tokens[i + 1] === "LBRACE") {                               // if next token is {
@@ -70,13 +71,27 @@ const parser = (tokens) => {
 	  }
 	}
 
+        for (let i = 0; i < code.length; ++i) {
+	  let str = "";
+	  if (code[i] === "STRING_START") {
+	    while (code[++i] !== "STRING_END") {
+	      str += code[i].substring(15, code[i].length) + " ";
+	    }
+	    str = str.substring(0, str.length - 1);
+	    code = code.splice(i + 1, code.length);
+	    code.push(`STRING_${str}`);
+	  }
+          // parsed.strings.push(str);
+
+	}
+
 	functionCall.type = "FUNCTION_CALL";
 	functionCall.id = id;
 	functionCall.args = code;
 	parsed.mainFunction.push(functionCall);                       // add the function call to the main function
       }
 
-    }
+    } 
   }
   return parsed;
 }
@@ -86,19 +101,12 @@ export default parser;
 /*
 const code = `
 
-add {
-  $1 + $2
-  5 + 2
-}
+out "Hello world"
 
-sub {
-  $1 - $2
-}
+out "Hello worl"
 
-result = add 1 2
-sub 2 1
+out 'Hello xD'
 
-out result
 `;
 
 const tokens = tokenizer(code);
@@ -108,3 +116,4 @@ const parsed = parser(tokens);
 console.log(tokens);
 console.log(parsed);
 */
+

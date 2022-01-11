@@ -1,0 +1,12 @@
+add {
+  $1 + $2
+}
+
+sub {
+  $1 - $2
+}
+
+result = add 1 2
+result = sub 2 1
+
+out result
