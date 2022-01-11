@@ -76,6 +76,10 @@ int main() {
       res += `${useAuto ? "auto" : ""} ${parsed.mainFunction[i].id} = `;
 
       useAuto = true;
+
+      if (parsed.mainFunction[i]?.value) {
+        res += parsed.mainFunction[i].value + ";\n";
+      }
     } else if (parsed.mainFunction[i].type === "FUNCTION_CALL") {
       if (parsed.mainFunction[i].id === "out") { // internal function
        res = res.replace("/* FUNCTIONS */", `/* FUNCTIONS */

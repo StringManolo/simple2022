@@ -47,10 +47,18 @@ const parser = (tokens) => {
 	  numberOfArgs: numberOfArgs
 	});
       } else if (tokens[i + 1] === "ASSIGN") {                        // if next token is =
-        parsed.mainFunction.push({
-          type: "ASSIGNMENT",
-	  id: tokens[i].substring(3, tokens[i].length)
-	})
+	if (tokens[i + 2].substring(0, 7) === "NUMBER_") {
+          parsed.mainFunction.push({
+            type: "ASSIGNMENT",
+	    id: tokens[i].substring(3, tokens[i].length),
+	    value: tokens[i + 2].substring(7, tokens[i + 2].length)
+	  });
+	} else {
+          parsed.mainFunction.push({
+            type: "ASSIGNMENT",
+	    id: tokens[i].substring(3, tokens[i].length)
+	  })
+	}
       } else {                                                        // if next token is an argument (in a function call)
         const functionCall = {};
 	const id = tokens[i].substring(3, tokens[i].length);
@@ -101,11 +109,7 @@ export default parser;
 /*
 const code = `
 
-out "Hello world"
-
-out "Hello worl"
-
-out 'Hello xD'
+myNumber = 1
 
 `;
 
