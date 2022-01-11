@@ -47,12 +47,28 @@ const parser = (tokens) => {
 	  numberOfArgs: numberOfArgs
 	});
       } else if (tokens[i + 1] === "ASSIGN") {                        // if next token is =
-	if (tokens[i + 2].substring(0, 7) === "NUMBER_") {
+        
+	if (tokens[i + 2] === "STRING_START") {
+          for (let k = i + 2; k < tokens.length; ++k) {
+            let str = "";
+            while (tokens[++k] !== "STRING_END") {
+              str += tokens[k].substring(15, tokens[k].length) + " ";
+            }
+            str = str.substring(0, str.length - 1);
+            parsed.mainFunction.push({
+              type: "ASSIGNMENT",
+	      id: tokens[i].substring(3, tokens[i].length),
+	      value: "\"" + str + "\""
+	    });
+	    break;
+          }
+	} else if (tokens[i + 2].substring(0, 7) === "NUMBER_") {
           parsed.mainFunction.push({
             type: "ASSIGNMENT",
 	    id: tokens[i].substring(3, tokens[i].length),
 	    value: tokens[i + 2].substring(7, tokens[i + 2].length)
 	  });
+
 	} else {
           parsed.mainFunction.push({
             type: "ASSIGNMENT",
@@ -109,7 +125,7 @@ export default parser;
 /*
 const code = `
 
-myNumber = 1
+name = "String Manolo"
 
 `;
 

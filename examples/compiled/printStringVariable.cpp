@@ -7,7 +7,8 @@ void out(auto ARGUMENT_1) {
 /* END FUNCTIONS */
 
 int main() {
-auto name = out (name);
+auto name = "String Manolo";
+out (name);
 
   return 0;
 }
