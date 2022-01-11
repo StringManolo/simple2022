@@ -93,7 +93,7 @@ int main() {
 	if (!/void\ out/g.test(res)) {
           res = res.replace("/* FUNCTIONS */", `/* FUNCTIONS */
 void out(auto ARGUMENT_1) {
-  std::cout << ARGUMENT_1 << std::endl; 
+  std::cout << ARGUMENT_1; 
 }
 `);
 	}

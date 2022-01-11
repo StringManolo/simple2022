@@ -54,7 +54,7 @@ const parser = (tokens) => {
             while (tokens[++k] !== "STRING_END") {
               str += tokens[k].substring(15, tokens[k].length) + " ";
             }
-            str = str.substring(0, str.length - 1);
+            str = str.substring(0, str.length);
             parsed.mainFunction.push({
               type: "ASSIGNMENT",
 	      id: tokens[i].substring(3, tokens[i].length),
@@ -101,7 +101,7 @@ const parser = (tokens) => {
 	    while (code[++i] !== "STRING_END") {
 	      str += code[i].substring(15, code[i].length) + " ";
 	    }
-	    str = str.substring(0, str.length - 1);
+	    str = str.substring(0, str.length);
 	    code = code.splice(i + 1, code.length);
 	    code.push(`STRING_${str}`);
 	  }
@@ -125,7 +125,7 @@ export default parser;
 /*
 const code = `
 
-name = "String Manolo"
+name = "String Manolo "
 
 `;
 

@@ -14,10 +14,14 @@ division {
   $1 / $2
 }
 
-num1 = 6
-num2 = 2
+num1 = in "Your first number"
+num2 = in "Your second number"
 
 res = addition num1 num2
+out num1
+out " +          "
+out num2
+out " =  "
 out res
 
 res = substraction num1 num2
