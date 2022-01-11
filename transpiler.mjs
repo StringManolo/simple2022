@@ -97,6 +97,17 @@ void out(auto ARGUMENT_1) {
 }
 `);
 	}
+      } else if (parsed.mainFunction[i].id === "in") { // internal function
+        if (!/auto\ in/g.test(res)) {
+          res = res.replace("/* FUNCTIONS */", `/* FUNCTIONS */
+auto in(auto ARGUMENT_1) {
+  std::cout << ARGUMENT_1;
+  std::string userInput;
+  getline(std::cin, userInput);
+  return userInput;
+}
+`);
+	}
       }
 
      
