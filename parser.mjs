@@ -108,7 +108,7 @@ const parser = (tokens) => {
 	  let str = "";
 	  if (code[i] === "STRING_START") {
 	    while (code[++i] !== "STRING_END") {
-	      str += code[i].substring(15, code[i].length) + " ";
+	      str += code[i].substring(15, code[i].length).replace(/\%\%INTERNAL\_STRING\_SPACE\%\%/g, " ") + " ";
 	    }
 
 	    str = str.substring(0, str.length-1); // remove extra space

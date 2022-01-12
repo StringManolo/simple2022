@@ -1,9 +1,50 @@
 const tokenizer = code => {
+  const fixSpacesInStrings = code => {
+    code = code.split("");
+    let inString = false;
+    for (let i = 0; i < code.length; ++i) {
+      if (code[i] !== "\"" && inString === "doublequote") {
+        if (code[i] === " ") {
+          code[i] = "%%INTERNAL_STRING_SPACE%%";
+	}
+      }
+ 
+      if (code[i] === "\"") {
+        if (inString === "doublequote" && code[i-1] !== "\\") {
+          inString = false;
+	  break;
+	}
+        inString = "doublequote";
+      }
+    }
+
+    for (let i = 0; i < code.length; ++i) {
+      if (code[i] !== "'" && inString === "singlequote") {
+        if (code[i] === " ") {
+          code[i] = "%%INTERNAL_STRING_SPACE%%";
+        }
+      }
+
+      if (code[i] === "'") {
+        if (inString === "singlequote" && code[i-1] !== "\\") {
+          inString = false;
+          break;
+        }
+        inString = "singlequote";
+      }
+    }
+
+
+
+    return code.join("");;
+  }
+
   let tokens = [];
   code = code.trim();
   const lines = code.split("\n");
   for (let i in lines) {
-    const words = lines[i].split(" ");
+    // TODO: avoid split using spaces in strings
+    const words = fixSpacesInStrings(lines[i]).split(" ");
     for (let j = 0; j < words.length; ++j) {
       // TODO: Parse commentaries (lines starting by # or multiline ? 
       switch(words[j].trim()) {
@@ -41,7 +82,6 @@ const tokenizer = code => {
 
 	default: 
           let token = words[j].trim();
-
 
 	  // Start by $ and only contains numbers
 	  if (token[0] === "$" && /^[0-9]+$/.test(token.substring(1, token.length))) {
