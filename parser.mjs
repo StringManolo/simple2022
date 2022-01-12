@@ -59,7 +59,7 @@ const parser = (tokens) => {
             while (tokens[++k] !== "STRING_END") {
               str += tokens[k].substring(15, tokens[k].length) + " ";
             }
-            str = str.substring(0, str.length);
+            str = str.substring(0, str.length-1); // remove extra space
             parsed.mainFunction.push({
               type: "ASSIGNMENT",
 	      id: tokens[i].substring(3, tokens[i].length),
@@ -111,7 +111,7 @@ const parser = (tokens) => {
 	      str += code[i].substring(15, code[i].length) + " ";
 	    }
 
-	    str = str.substring(0, str.length);
+	    str = str.substring(0, str.length-1); // remove extra space
 	    code = code.splice(i + 1, code.length);
 	    code.push(`STRING_${str}`);
 	  }

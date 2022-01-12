@@ -7,9 +7,8 @@ void out(auto ARGUMENT_1) {
 /* END FUNCTIONS */
 
 int main() {
-auto name = "String Manolo ";
-out (name);
-out ("\n ");
+auto msg = "Hello world!";
+out (msg);
 
   return 0;
 }

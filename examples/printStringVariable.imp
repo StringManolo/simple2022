@@ -1,4 +1,2 @@
-name = "String Manolo"
-out name
-
-out "\n"
+msg = "Hello world!"
+out msg
