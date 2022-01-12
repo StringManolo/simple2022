@@ -1,1 +1,2 @@
 - Predefined functions (out, for, while, if, else ...)
+- Fix -> out "\n" bug

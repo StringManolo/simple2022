@@ -1,2 +1,4 @@
 name = "String Manolo"
 out name
+
+out "\n"

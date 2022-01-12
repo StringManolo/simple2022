@@ -110,6 +110,7 @@ const parser = (tokens) => {
 	    while (code[++i] !== "STRING_END") {
 	      str += code[i].substring(15, code[i].length) + " ";
 	    }
+
 	    str = str.substring(0, str.length);
 	    code = code.splice(i + 1, code.length);
 	    code.push(`STRING_${str}`);

@@ -40,7 +40,7 @@ const tokenizer = code => {
 	break;
 
 	default: 
-          const token = words[j].trim();
+          let token = words[j].trim();
 
 
 	  // Start by $ and only contains numbers
@@ -53,6 +53,11 @@ const tokenizer = code => {
             tokens.push("NUMBER_" + token);
           } else if (token.substring(0, 1) === "\"") { // Parse " strings
             tokens.push("STRING_START");
+	    if (token[token.length-1] === "\"") {
+	      if (! (j+1 !== words.length && words[j] !== "\\" && words[++j].trim() !== "\"") ) {
+                token = token.substring(0, token.length - 1);
+	      }
+	    }
 	    tokens.push(`STRING_CONTENT_${token.substring(1, token.length)}`);
 	    while (j+1 !== words.length && words[j] !== "\\" && words[++j].trim() !== "\"") {
 	      if (words[j][words[j].length-1] === "\"") {
@@ -64,6 +69,11 @@ const tokenizer = code => {
 
           } else if (token.substring(0, 1) === "'") { // Parse ' strings
             tokens.push("STRING_START");
+	    if (token[token.length-1] === "'") {
+	      if (! (j+1 !== words.length && words[j] !== "\\" && words[++j].trim() !== "'") ) {
+		token = token.substring(0, token.length - 1);
+	      }
+	    }
             tokens.push(`STRING_CONTENT_${token.substring(1, token.length)}`);
             while (j+1 !== words.length && words[j] !== "\\" && words[++j].trim() !== "'") {
               if (words[j][words[j].length-1] === "'") {
