@@ -1,0 +1,5 @@
+sayHello {
+  out "Hello"
+}
+
+sayHello

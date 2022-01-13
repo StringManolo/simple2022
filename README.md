@@ -49,4 +49,12 @@ node compile.mjs -f myCode.imp -l c++
 
 #### Syntax
 ##### Functions
+```
+sayHello {
+  out "Hello"
+}
+
+sayHello
+```
+
 

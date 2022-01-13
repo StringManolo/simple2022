@@ -137,11 +137,21 @@ auto in(auto ARGUMENT_1) {
         res += "}\n"
       } else if (parsed.mainFunction[i].id === "else") { // internal function
         res += "} else {\n"
+      } else if (parsed.mainFunction[i].id === "for") { // internal function
+	parsed.mainFunction[i].args = replaceTokens(parsed.mainFunction[i].args).split(" ");
+	const aux = parsed.mainFunction[i].args.splice(0, 1); // name of var
+	parsed.mainFunction[i].args[0] = `int ${aux} = ${parsed.mainFunction[i].args[0]}; `
+	parsed.mainFunction[i].args[1] = `${aux} != ${parsed.mainFunction[i].args[1]}; `;
+	parsed.mainFunction[i].args[2] = `${aux} = ${aux} + ${parsed.mainFunction[i].args[2]}`;
+        res += `for (${replaceTokens(parsed.mainFunction[i].args)}) {\n`;
+      } else if (parsed.mainFunction[i].id === "rof") { // internal function
+        res += "}\n";
       }
 
 
       if (parsed.mainFunction[i].id !== "if" && parsed.mainFunction[i].id !== "fi" &&
-          parsed.mainFunction[i].id !== "else") { 
+          parsed.mainFunction[i].id !== "else" && 
+	  parsed.mainFunction[i].id !== "for" && parsed.mainFunction[i].id !== "rof") { 
         if (parsed.mainFunction[i]?.args?.length && parsed.mainFunction[i].args[0].substring(0, 7) === "STRING_") {
           parsed.mainFunction[i].args[0] = "\"" + parsed.mainFunction[i].args[0].substring(7, parsed.mainFunction[i].args[0].length).replace(/ /g, "INTERNAL_SPACE") + "\"";
         }
