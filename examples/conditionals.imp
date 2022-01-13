@@ -1,0 +1,17 @@
+sub {
+  $1 - $2
+}
+
+age = +in "Your age -> "
+
+if age < 18
+  out "You are underage, access denied."
+  diff = sub 18 age
+  out "\nTry again in "
+  out diff
+  out " year/s"
+else
+  out "Welcome!"
+fi
+
+

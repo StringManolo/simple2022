@@ -35,8 +35,7 @@ const tokenizer = code => {
     }
 
 
-
-    return code.join("");;
+    return code.join("").trim();
   }
 
   let tokens = [];
@@ -76,6 +75,14 @@ const tokenizer = code => {
 	  tokens.push("ASSIGN");
 	break;
 
+        case ">":
+	  tokens.push("GREATER_THAN");
+	break;
+
+	case "<":
+	  tokens.push("LESS_THAN");
+	break;
+
 	case "":
 	  "pass";
 	break;
@@ -94,13 +101,13 @@ const tokenizer = code => {
           } else if (token.substring(0, 1) === "\"") { // Parse " strings
             tokens.push("STRING_START");
 	    if (token[token.length-1] === "\"") {
-	      if (! (j+1 !== words.length && words[j] !== "\\" && words[++j].trim() !== "\"") ) {
+	      if (! ( j+1 !== words.length && words[j] !== "\\" && words[++j]?.trim() !== "\"") ) {
                 token = token.substring(0, token.length - 1);
 	      }
 	    }
 	    tokens.push(`STRING_CONTENT_${token.substring(1, token.length)}`);
-	    while (j+1 !== words.length && words[j] !== "\\" && words[++j].trim() !== "\"") {
-	      if (words[j][words[j].length-1] === "\"") {
+	    while (j+1 !== words.length && words[j] !== "\\" && words[++j]?.trim() !== "\"") {
+	      if (words[j][words[j]?.length-1] === "\"") {
                 words[j] = words[j].substring(0, words[j].length - 1);
 	      }
 	      tokens.push(`STRING_CONTENT_${words[j]}`);
@@ -133,29 +140,8 @@ const tokenizer = code => {
     tokens.push("LINEBREAK");
   }
 
-  // tokens = tokens.join(" ");
   return tokens;
 }
 
 export default tokenizer;
-
-/*
-const code = `
-
-add {
-  $1 + $2
-}
-
-sub {
-  $1 - $2
-}
-
-add 1 2
-sub 2 1
-
-`;
-
-tokenizer(code);
-*/
-
 

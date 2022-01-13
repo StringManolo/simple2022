@@ -35,6 +35,14 @@ ${code}`;
 	  tokens[i] = "/";
 	break;
 
+	case "GREATER_THAN":
+	  tokens[i] = ">";
+	break;
+
+	case "LESS_THAN":
+	  tokens[i] = "<";
+	break;
+
 	default:
 	  if (tokens[i].substr(0, 7) === "NUMBER_") {
             // decl arg is int ?
@@ -123,14 +131,23 @@ auto in(auto ARGUMENT_1) {
 `);
 	  }
 	}
+      } else if (parsed.mainFunction[i].id === "if") { // internal function
+        res += `if (${replaceTokens(parsed.mainFunction[i].args)}) {\n`;
+      } else if (parsed.mainFunction[i].id === "fi") { // internal function
+        res += "}\n"
+      } else if (parsed.mainFunction[i].id === "else") { // internal function
+        res += "} else {\n"
       }
 
-     
-      if (parsed.mainFunction[i].args[0].substring(0, 7) === "STRING_") {
-        parsed.mainFunction[i].args[0] = "\"" + parsed.mainFunction[i].args[0].substring(7, parsed.mainFunction[i].args[0].length).replace(/ /g, "INTERNAL_SPACE") + "\"";
-      }
 
-      res += `${parsed.mainFunction[i].id} (${replaceTokens(parsed.mainFunction[i].args).replace(/ /g, ", ").replace(/INTERNAL_SPACE/g, " ")});\n`;
+      if (parsed.mainFunction[i].id !== "if" && parsed.mainFunction[i].id !== "fi" &&
+          parsed.mainFunction[i].id !== "else") { 
+        if (parsed.mainFunction[i]?.args?.length && parsed.mainFunction[i].args[0].substring(0, 7) === "STRING_") {
+          parsed.mainFunction[i].args[0] = "\"" + parsed.mainFunction[i].args[0].substring(7, parsed.mainFunction[i].args[0].length).replace(/ /g, "INTERNAL_SPACE") + "\"";
+        }
+
+        res += `${parsed.mainFunction[i].id} (${replaceTokens(parsed.mainFunction[i].args).replace(/ /g, ", ").replace(/INTERNAL_SPACE/g, " ")});\n`;
+      }
     }
   }
 
