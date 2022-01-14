@@ -80,7 +80,7 @@ in "What is your name?"
 
 - +in
 ```
-+in "How old are you"
++in "How old are you?"
 ```
 
 ##### Functions
@@ -124,7 +124,7 @@ fi
 ```
 
 ##### Loops
-- For
+- For  
 For loops require four arguments. Variable name for the itherator, initial variable value, value to reach, amouth of increment.
 ```
 for i 0 10 1
