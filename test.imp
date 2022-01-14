@@ -1,5 +1,0 @@
-sayHello {
-  out "Hello"
-}
-
-sayHello

@@ -27,7 +27,8 @@ const parser = (tokens) => {
 	if (/LINEBREAK/.test(code.join(" "))) {
           for (let j = code.length; j > 0; --j) {
             if (code[j] === "LINEBREAK") {
-              code[j] = "INTERNAL_RETURN" 
+              code[j] = "INTERNAL_RETURN"
+	      break; // only replace last linebreak
 	    }
 	  }
 	} else {
@@ -41,9 +42,79 @@ const parser = (tokens) => {
 	  }
 	}
 
+/* TEST CODE */
+ 
+        const body = {};
+	body.expressions = [];
+
+        for (let i in code) {
+          if (code[i].substring(0, 3) === "ID_") {
+            code[i] = code[i].substring(3, code[i].length);
+          }
+        }
+
+        let stringStart = 0;
+        for (let i = 0; i < code.length; ++i) {
+          let str = "";
+          if (code[i] === "STRING_START") {
+	    stringStart = i;
+            while (code[++i] !== "STRING_END") {
+              str += code[i].substring(15, code[i].length).replace(/\%\%INTERNAL\_STRING\_SPACE\%\%/g, " ") + " ";
+            }
+            str = str.substring(0, str.length-1); // remove extra space
+	    code.splice(stringStart, 0, `STRING_${str}`);
+          }
+          // parsed.strings.push(str);
+        }
+
+	for (let i = 0; i < code.length; ++i) {
+          if (code[i] === "STRING_START" || code[i] === "STRING_END" || code[i].substring(0, 15) === "STRING_CONTENT_") {
+            code.splice(i--, 1);
+
+	  }
+          
+	  /* expression parsing: */
+
+          /*if (code[i] === "out") {
+            body.expressions.push({
+              type: "FUNCTION_CALL",
+	      id: "out",
+	      args: code[i + 1],
+	    });
+	  } else if (code[i] === "INTERNAL_RETURN") {
+            body.expressions.push({
+	      type: "LAST_EXPRESSION",
+	      id: "INTERNAL_RETURN",
+	      args: code.splice(i, code.length - i)
+	    });
+	  }
+	  */
+
+	}
+  
+ /*
+"body": [
+        "out",
+        "STRING_abc",
+        "LINEBREAK",
+        "out",
+        "STRING_def",
+        "LINEBREAK",
+        "out",
+        "STRING_ghi",
+        "INTERNAL_RETURN",
+        "ARGUMENT_1",
+        "PLUS",
+        "ARGUMENT_2"
+      ],
+  */
+/* TEST END CODE */
+
+        
 	parsed.functions.push({
           id: id,
-          body: code, // parser(code)
+	  //body: body, // TEST CODE
+          body: code,
 	  numberOfArgs: numberOfArgs
 	});
       } else if (tokens[i + 1] === "ASSIGN") {                        // if next token is =

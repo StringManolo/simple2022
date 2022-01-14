@@ -12,11 +12,21 @@ ${code}`;
     return code;
   }
 
+  let internalBodyFunctions = [];
+  const internalBodyFunction = functionName => {
+    for (let i in internalBodyFunctions) {
+      if (internalBodyFunctions[i] === functionName) {
+        return true;
+      }
+    }
+    return false;
+  }
   const replaceTokens = (tokens) => {
-    for (let i in tokens) {
+    for (let i = 0; i < tokens.length; ++i) {
       switch(tokens[i]) {
         case "INTERNAL_RETURN":
 	  tokens[i] = "return";
+	  if (i > 0) tokens[i] = ";\n" + tokens[i];
 	break;
 
 	case "PLUS":
@@ -43,30 +53,54 @@ ${code}`;
 	  tokens[i] = "<";
 	break;
 
+	case "LINEBREAK":
+          tokens[i] = ";\n";
+	break;
+
 	default:
 	  if (tokens[i].substr(0, 7) === "NUMBER_") {
             // decl arg is int ?
 	    tokens[i] = tokens[i].substring(7, tokens[i].length);
 	  }
+
+	  if (tokens[i].substr(0, 7) === "STRING_") {
+            tokens[i] = `"${tokens[i].substring(7, tokens[i].length)}"`;
+	  }
+      }
+
+    }
+
+    for (let i = 0; i < tokens.length; ++i) {
+      /* Function body parsing */ // The code is thrash, thanks for notice.
+      if (tokens[i] === "out") { // TODO: Allow more internal functions inside body
+	tokens[i] = "out (";
+	tokens[i+1] += ")"
+	internalBodyFunctions.push("out");
       }
     }
+
     return tokens.join(" ");
   }
 
   const tokens = tokenizer(code);
   const parsed = parser(tokens);
 
-  let res = "/* FUNCTIONS */"
+  let res = "/* FUNCTIONS */";
+
   for (let i in parsed.functions) {
     let args = "(";
     for (let j = 0; j < parsed.functions[i].numberOfArgs; ++j) {
       // track function calls to guess type
       args += "auto ARGUMENT_" + (j + 1) + ", ";
     }
-    args = args.substring(0, args.length - 2); // remove last comma
+    if (parsed.functions[i].numberOfArgs) {
+      args = args.substring(0, args.length - 2); // remove last comma
+    } else {
+      
+    }
     args += ")";
 
-
+    // TODO: Transpile function body ?? Need design first
     res += `
 auto ${parsed.functions[i].id} ${args} {
   ${replaceTokens(parsed.functions[i].body)};
@@ -74,7 +108,7 @@ auto ${parsed.functions[i].id} ${args} {
 `;
   }
   res += "/* END FUNCTIONS */\n";
-
+  
   res += `
 int main() {
 `;
@@ -97,7 +131,7 @@ int main() {
         res += parsed.mainFunction[i].value + ";\n";
       }
     } else if (parsed.mainFunction[i].type === "FUNCTION_CALL") {
-      if (parsed.mainFunction[i].id === "out") { // internal function
+      if (parsed.mainFunction[i].id === "out" || internalBodyFunction("out")) { // internal function
 	if (!/void\ out/g.test(res)) {
           res = res.replace("/* FUNCTIONS */", `/* FUNCTIONS */
 void out(auto ARGUMENT_1) {
